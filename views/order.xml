@@ -1,0 +1,115 @@
+<odoo>
+    <data>
+        <!-- explicit form view definition -->
+        <record id="view_order_management_form" model="ir.ui.view">
+            <field name="name">order.management.form</field>
+            <field name="model">order_management.order_management</field>
+            <field name="arch" type="xml">
+                <form string="Order Management">
+                    <sheet>
+                        <header>
+                            <button name="action_confirm_order" string="Confirmer la commande"
+                                    type="object" class="btn-primary"
+                                     modifiers="{'invisible': [('state', '!=', 'draft')]}"/>
+                            <field name="state" widget="statusbar"
+                                   statusbar_visible="draft,confirmed,in_progress,delivered,cancelled"/>
+                        </header>
+                        <group>
+                            <group>
+                                <field name="name" readonly="1"/>
+                                <field name="partner_id"/>
+                                <field name="order_date"/>
+                                <field name="delivery_date"/>
+                            </group>
+                            <group>
+                                <field name="amount_untaxed" readonly="1"/>
+                                <field name="amount_tax" readonly="1"/>
+                                <field name="amount_total" readonly="1"/>
+                            </group>
+                        </group>
+                        <notebook>
+                            <page string="Order Lines">
+                                <field name="order_line_ids">
+                                    <tree editable="bottom" string="Order Lines">
+                                        <field name="product_id"/>
+                                        <field name="quantity"/>
+                                        <field name="price_unit"/>
+                                        <field name="price_subtotal" readonly="1"/>
+                                        <field name="price_tax" readonly="1"/>
+                                    </tree>
+                                </field>
+                            </page>
+                            <page string="Notes">
+                                <field name="note" widget="text"/>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <!-- explicit list view definition -->
+        <record id="view_order_management_tree" model="ir.ui.view">
+            <field name="name">order.management.tree</field>
+            <field name="model">order_management.order_management</field>
+            <field name="arch" type="xml">
+                <tree string="Order Management">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="order_date"/>
+                    <field name="delivery_date"/>
+                    <field name="state"/>
+                    <field name="amount_total"/>
+                </tree>
+            </field>
+        </record>
+
+        <!-- Vue recherche pour le modèle de gestion des commandes -->
+        <record id="view_order_management_search" model="ir.ui.view">
+            <field name="name">order.management.search</field>
+            <field name="model">order_management.order_management</field>
+            <field name="arch" type="xml">
+                <search string="Order Management Search">
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="state"/>
+                    <field name="order_date"/>
+                    <field name="delivery_date"/>
+                    <!--                    <filter string="Draft" domain="[('state', '=', 'draft')]"/>-->
+                    <!--                    <filter string="Confirmed" domain="[('state', '=', 'confirmed')]"/>-->
+                    <!--                    <filter string="Delivered" domain="[('state', '=', 'delivered')]"/>-->
+                </search>
+            </field>
+        </record>
+
+        <!-- actions opening views on models -->
+        <record id="action_order_management" model="ir.actions.act_window">
+            <field name="name">Order Management</field>
+            <field name="res_model">order_management.order_management</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <p>
+                    Manage your orders efficiently. Track order states and associated products.
+                </p>
+            </field>
+        </record>
+
+        <!-- server action to the one above -->
+        <!--
+            <record model="ir.actions.server" id="order_management.action_server">
+              <field name="name">order_management server</field>
+              <field name="model_id" ref="model_order_management_order_management"/>
+              <field name="state">code</field>
+              <field name="code">
+                action = {
+                  "type": "ir.actions.act_window",
+                  "view_mode": "tree,form",
+                  "res_model": model._name,
+                }
+              </field>
+            </record>
+        -->
+
+
+    </data>
+</odoo>

@@ -1,0 +1,46 @@
+<odoo>
+    <data>
+        <!-- Vue formulaire pour les lignes de commande -->
+    <record id="view_order_line_form" model="ir.ui.view">
+        <field name="name">order.line.form</field>
+        <field name="model">order_management.order_line</field>
+        <field name="arch" type="xml">
+            <form string="Order Line">
+                <sheet>
+                    <group>
+                        <field name="order_id" readonly="1"/>
+                        <field name="product_id"/>
+                        <field name="quantity"/>
+                        <field name="price_unit" readonly="1"/>
+                        <field name="price_subtotal" readonly="1"/>
+                        <field name="price_tax" readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+        <!-- Vue en liste pour les lignes de commande -->
+    <record id="view_order_line_tree" model="ir.ui.view">
+        <field name="name">order.line.tree</field>
+        <field name="model">order_management.order_line</field>
+        <field name="arch" type="xml">
+            <tree string="Order Lines">
+                <field name="order_id"/>
+                <field name="product_id"/>
+                <field name="quantity"/>
+                <field name="price_unit"/>
+                <field name="price_subtotal" readonly="1"/>
+                <field name="price_tax" readonly="1"/>
+            </tree>
+        </field>
+    </record>
+
+        <!-- Action pour afficher les lignes de commande -->
+    <record id="action_order_line" model="ir.actions.act_window">
+        <field name="name">Order Lines</field>
+        <field name="res_model">order_management.order_line</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    </data>
+</odoo>
