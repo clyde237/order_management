@@ -24,6 +24,7 @@ automatique aux utilisateurs à chaque etape.
     # always loaded
     'data': [
         'security/ir.model.access.csv',
+        'security/order_groups.xml',
         'data/order_sequence.xml',
         'data/email_template.xml',
         'views/order.xml',

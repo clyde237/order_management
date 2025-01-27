@@ -10,7 +10,8 @@
                         <header>
                             <button name="action_confirm_order" string="Confirmer la commande"
                                     type="object" class="btn-primary"
-                                     modifiers="{'invisible': [('state', '!=', 'draft')]}"/>
+                                     modifiers="{'invisible': [('state', '!=', 'draft')]}"
+                                    groups="order_management.group_team_sale"/>
                             <field name="state" widget="statusbar"
                                    statusbar_visible="draft,confirmed,in_progress,delivered,cancelled"/>
                         </header>
