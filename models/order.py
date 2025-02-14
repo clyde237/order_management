@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models, fields, api
-
+from odoo import models, fields, api, _
 
 class OrderManagement(models.Model):
     _name = 'order_management.order_management'
+    _inherit = ['mail.thread', 'mail.activity.mixin']
     _description = 'Gestion des Commandes'
 
     # Identification de la commande
@@ -25,14 +25,11 @@ class OrderManagement(models.Model):
         ('in_progress', 'In progress'),
         ('delivered', 'Delivered'),
         ('cancelled', 'Cancelled'),
-    ], string="State", default='draft', required=True)
+    ], string="State", default='draft', required=True, track_visibility='onchange')
 
     # Dates importantes
     order_date = fields.Datetime(string="Order date", default=fields.Datetime.now, required=True)
     delivery_date = fields.Datetime(string="Delivery date")
-
-    # Relation avec le module produit
-    # product_ids = fields.Many2many('product.product', string="Produits")
 
     # Produits de la commande
     order_line_ids = fields.One2many('order_management.order_line', 'order_id', string="Order Lines")
@@ -46,7 +43,11 @@ class OrderManagement(models.Model):
     note = fields.Text(string="Remarques")
 
     # Métadonnées
-    user_id = fields.Many2one('res.users', string="Responsable", default=lambda self: self.env.user)
+    user_id = fields.Many2one('res.users',
+                              string="Responsable",
+                              domain=[('groups_id.name', '=', 'Team Sale')]
+                              )
+    current_user_id = fields.Many2one('res.users', string="Employé", default=lambda self: self.env.user, readonly=True)
     company_id = fields.Many2one('res.company', string="Société", default=lambda self: self.env.company)
 
     # Calcul des totaux
@@ -65,18 +66,51 @@ class OrderManagement(models.Model):
     def create(self, vals):
         if vals.get('name', 'New') == 'New':
             vals['name'] = self.env['ir.sequence'].next_by_code('order_management.order_management') or 'New'
-            return super(OrderManagement, self).create(vals)
+        order = super(OrderManagement, self).create(vals)
+        # Créer un rappel pour le responsable
+        order.create_reminder()
+        return order
 
-    # Méthode pour confirmer la commande
     def action_confirm_order(self):
         if not self.env.user.has_group('sales_team.group_sale_manager'):
             raise AccessError(_("Seuls les chefs des ventes peuvent confirmer une commande."))
         self.state = 'confirmed'
-        # Envoyer un email automatique
-        template_id = self.env.ref('order_management.email_template_order_confirmation')
-        if template_id:
-            template_id.send_mail(self.id, force_send=True)
+        # Créer un rappel pour l'employé en charge de la commande
+        self.create_employee_reminder()
         return True
+
+    def action_deliver_order(self):
+        self.state = 'delivered'
+
+    def create_reminder(self):
+        """Créer un rappel pour le responsable."""
+        activity_type_id = self.env.ref('mail.mail_activity_data_todo').id
+        model_id = self.env['ir.model'].search([('model', '=', 'order_management.order_management')], limit=1).id
+
+        self.env['mail.activity'].create({
+            'res_id': self.id,
+            'res_model_id': model_id,
+            'activity_type_id': activity_type_id,
+            'summary': 'Order Management Reminder',
+            'note': 'N\'oubliez pas de traiter cette commande.',
+            'user_id': self.user_id.id,
+            'date_deadline': fields.Date.today(),
+        })
+
+    def create_employee_reminder(self):
+        """Créer un rappel pour l'employé en charge de la commande."""
+        activity_type_id = self.env.ref('mail.mail_activity_data_todo').id
+        model_id = self.env['ir.model'].search([('model', '=', 'order_management.order_management')], limit=1).id
+
+        self.env['mail.activity'].create({
+            'res_id': self.id,
+            'res_model_id': model_id,
+            'activity_type_id': activity_type_id,
+            'summary': 'Rappel pour l\'employé en charge de la commande',
+            'note': 'Veuillez traiter cette commande.',
+            'user_id': self.current_user_id.id,
+            'date_deadline': fields.Date.today(),
+        })
 
 class OrderLine(models.Model):
     _name = 'order_management.order_line'

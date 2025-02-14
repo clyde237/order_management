@@ -1,17 +1,50 @@
 <odoo>
     <data noupdate="1">
-        <record id="email_template_order_confirmation" model="mail.template">
-            <field name="name">Confirmation de commande</field>
-            <field name="model_id" ref="order_management.model_order_management_order_management"/>
-            <field name="subject">Votre commande ${object.name} est confirmée</field>
-            <field name="email_from">${(object.user_id.email or 'noreply@yourcompany.com')|safe}</field>
+        <!-- Email lors de la création -->
+        <record id="email_template_order_creation" model="mail.template">
+            <field name="name">Order Creation Notification</field>
+            <field name="email_from">${(user.email or 'noreply@example.com')|safe}</field>
             <field name="email_to">${object.partner_id.email|safe}</field>
+            <field name="subject">Order Confirmation - ${object.name}</field>
+            <field name="model_id" ref="model_order_management_order_management"/>
+            <field name="auto_delete" eval="True"/>
             <field name="body_html">
                 <![CDATA[
-                <p>Bonjour ${object.partner_id.name},</p>
-                <p>Nous vous confirmons que votre commande <b>${object.name}</b> a été validée.</p>
-                <p>Montant total : ${object.amount_total}.</p>
-                <p>Merci pour votre confiance.</p>
+                <p>Dear ${object.partner_id.name},</p>
+                <p>Your order <strong>${object.name}</strong> has been successfully created on ${object.order_date}.</p>
+                <p>Thank you for choosing us!</p>
+                ]]>
+            </field>
+        </record>
+
+        <!-- Email lors de la validation -->
+        <record id="email_template_order_validation" model="mail.template">
+            <field name="name">Order Validation Notification</field>
+            <field name="email_from">${(user.email or 'noreply@example.com')|safe}</field>
+            <field name="subject">Order Validated - ${object.name}</field>
+            <field name="model_id" ref="model_order_management_order_management"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html">
+                <![CDATA[
+                <p>Dear ${object.partner_id.name},</p>
+                <p>Your order <strong>${object.name}</strong> has been validated and is now being processed.</p>
+                <p>Thank you for your trust!</p>
+                ]]>
+            </field>
+        </record>
+
+        <!-- Email lors de la livraison -->
+        <record id="email_template_order_delivery" model="mail.template">
+            <field name="name">Order Delivery Notification</field>
+            <field name="email_from">${(user.email or 'noreply@example.com')|safe}</field>
+            <field name="subject">Order Delivered - ${object.name}</field>
+            <field name="model_id" ref="model_order_management_order_management"/>
+            <field name="auto_delete" eval="True"/>
+            <field name="body_html">
+                <![CDATA[
+                <p>Dear ${object.partner_id.name},</p>
+                <p>Your order <strong>${object.name}</strong> has been successfully delivered on ${object.delivery_date}.</p>
+                <p>We hope to serve you again soon!</p>
                 ]]>
             </field>
         </record>

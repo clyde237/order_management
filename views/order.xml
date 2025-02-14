@@ -26,7 +26,9 @@
                                 <field name="amount_untaxed" readonly="1"/>
                                 <field name="amount_tax" readonly="1"/>
                                 <field name="amount_total" readonly="1"/>
+                                <field name="user_id"/>
                             </group>
+                            <field name="current_user_id" string="Employé"/>
                         </group>
                         <notebook>
                             <page string="Order Lines">
@@ -57,6 +59,7 @@
                 <tree string="Order Management">
                     <field name="name"/>
                     <field name="partner_id"/>
+                    <field name="current_user_id"/>
                     <field name="order_date"/>
                     <field name="delivery_date"/>
                     <field name="state"/>

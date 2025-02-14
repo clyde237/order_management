@@ -19,7 +19,7 @@ automatique aux utilisateurs à chaque etape.
     'version': '17.0.0.0',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'product'],
+    'depends': ['base', 'product', 'mail'],
 
     # always loaded
     'data': [
